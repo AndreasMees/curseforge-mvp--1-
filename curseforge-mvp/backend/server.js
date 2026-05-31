@@ -5,6 +5,7 @@ const { initDB } = require('./db');
 
 const authRoutes = require('./routes/auth');
 const modRoutes = require('./routes/mods');
+const favoriteRoutes = require('./routes/favorites'); // ADD THIS
 
 const app = express();
 const PORT = 3005;
@@ -17,6 +18,7 @@ initDB();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/mods', modRoutes);
+app.use('/api/favorites', favoriteRoutes); // ADD THIS
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

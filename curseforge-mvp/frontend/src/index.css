@@ -1,4 +1,4 @@
-/* CurseForge Official Style - Complete Redesign */
+/* CurseForge Inspired CSS - Complete Version */
 :root {
   --cf-orange: #f1641e;
   --cf-orange-dark: #d45418;
@@ -116,6 +116,11 @@ body {
   cursor: pointer;
 }
 
+.logout-btn:hover {
+  background: #2a2e33;
+  color: white;
+}
+
 /* Hero Section - CurseForge Style */
 .hero {
   background: linear-gradient(135deg, #1a1e22 0%, #0f1114 100%);
@@ -163,59 +168,7 @@ body {
   font-size: 0.85rem;
 }
 
-/* Game Categories - CurseForge Official */
-.game-categories {
-  background: #1a1e22;
-  border-bottom: 1px solid #2c3035;
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 60px;
-  z-index: 99;
-}
-
-.categories-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.categories-wrapper::-webkit-scrollbar {
-  height: 4px;
-}
-
-.game-category {
-  background: transparent;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-  color: #8b8f95;
-  white-space: nowrap;
-}
-
-.game-category:hover {
-  background: #2a2e33;
-  color: white;
-}
-
-.game-category.active {
-  background: #f1641e;
-  color: white;
-}
-
-.game-icon {
-  font-size: 1.1rem;
-}
-
-/* Search Bar - CurseForge Style */
+/* Search Bar */
 .search-section {
   max-width: 1400px;
   margin: -1.5rem auto 0;
@@ -276,6 +229,58 @@ body {
   transform: scale(1.02);
 }
 
+/* Game Categories */
+.game-categories {
+  background: #1a1e22;
+  border-bottom: 1px solid #2c3035;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 60px;
+  z-index: 99;
+}
+
+.categories-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.categories-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.game-category {
+  background: transparent;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #8b8f95;
+  white-space: nowrap;
+}
+
+.game-category:hover {
+  background: #2a2e33;
+  color: white;
+}
+
+.game-category.active {
+  background: #f1641e;
+  color: white;
+}
+
+.game-icon {
+  font-size: 1.1rem;
+}
+
 /* Filters Bar */
 .filters-bar {
   max-width: 1400px;
@@ -313,7 +318,7 @@ body {
   outline: none;
 }
 
-/* Mods Grid */
+/* Mods Container */
 .mods-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -326,7 +331,7 @@ body {
   gap: 1.5rem;
 }
 
-/* Mod Card - CurseForge Official */
+/* Mod Card */
 .mod-card {
   background: #1a1e22;
   border-radius: 12px;
@@ -334,6 +339,7 @@ body {
   transition: all 0.3s;
   cursor: pointer;
   border: 1px solid #2c3035;
+  position: relative;
 }
 
 .mod-card:hover {
@@ -439,6 +445,22 @@ body {
 .delete-btn:hover {
   background: #6b3a3a;
   color: white;
+}
+
+.collection-btn {
+  background: #25292e;
+  border: 1px solid #2c3035;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.collection-btn:hover {
+  background: #2a2e33;
+  border-color: #f1641e;
 }
 
 /* Pagination */
@@ -560,7 +582,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.85) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -770,6 +792,104 @@ body {
   margin: 0 auto 1rem;
 }
 
+/* Auth Modal Styles */
+.auth-modal {
+  background: #1a1e22;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid #2c3035;
+  position: relative;
+  z-index: 2001;
+}
+
+.auth-modal h2 {
+  color: white;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.auth-modal input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background: #0f1114;
+  border: 1px solid #2c3035;
+  border-radius: 8px;
+  color: white;
+  outline: none;
+  font-size: 1rem;
+}
+
+.auth-modal input:focus {
+  border-color: #f1641e;
+}
+
+.auth-modal input::placeholder {
+  color: #4a4f56;
+}
+
+.auth-modal button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #f1641e, #f57c3a);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.auth-modal button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(241,100,30,0.3);
+}
+
+.auth-modal button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #f1641e;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.auth-switch:hover {
+  color: #f57c3a;
+  text-decoration: underline;
+}
+
+.auth-modal .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #2a2e33;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.auth-modal .modal-close:hover {
+  background: #f1641e;
+  transform: scale(1.05);
+}
+
 /* Toast */
 .toast {
   position: fixed;
@@ -803,54 +923,6 @@ body {
     transform: translateX(0);
     opacity: 1;
   }
-}
-
-/* Auth Modal */
-.auth-modal {
-  background: #1a1e22;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 400px;
-  width: 90%;
-  border: 1px solid #2c3035;
-}
-
-.auth-modal h2 {
-  color: white;
-  margin-bottom: 1.5rem;
-}
-
-.auth-modal input {
-  width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  background: #0f1114;
-  border: 1px solid #2c3035;
-  border-radius: 8px;
-  color: white;
-  outline: none;
-}
-
-.auth-modal input:focus {
-  border-color: #f1641e;
-}
-
-.auth-modal button {
-  width: 100%;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #f1641e, #f57c3a);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.auth-switch {
-  text-align: center;
-  margin-top: 1rem;
-  color: #f1641e;
-  cursor: pointer;
 }
 
 /* Responsive */
@@ -913,5 +985,47 @@ body {
   .thumbnail-btn {
     width: 50px;
     height: 50px;
+  }
+  
+  .page-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+  
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  
+  .mods-container {
+    padding: 1rem;
+  }
+  
+  .game-category {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .stats {
+    gap: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
   }
 }

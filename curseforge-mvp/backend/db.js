@@ -39,6 +39,40 @@ function initDB() {
         FOREIGN KEY (author_id) REFERENCES users(id)
     )`);
     
+    // NEW: Favorites table for saving mods
+    db.run(`CREATE TABLE IF NOT EXISTS favorites (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        mod_id INTEGER NOT NULL,
+        mod_name TEXT NOT NULL,
+        mod_logo_url TEXT,
+        mod_author TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, mod_id)
+    )`);
+    
+    // NEW: Mod pack collections (playlists)
+    db.run(`CREATE TABLE IF NOT EXISTS collections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+    
+    // NEW: Collection items (mods in a collection)
+    db.run(`CREATE TABLE IF NOT EXISTS collection_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        collection_id INTEGER NOT NULL,
+        mod_id INTEGER NOT NULL,
+        mod_name TEXT NOT NULL,
+        mod_logo_url TEXT,
+        added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE
+    )`);
+    
     console.log(`✅ Andmebaas valmis: ${DB_PATH}`);
 }
 

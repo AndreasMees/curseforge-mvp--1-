@@ -5,6 +5,7 @@ import ModModal from './components/ModModal';
 import Nav from './components/Nav';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
+import Favorites from './pages/Favorites';
 import './index.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState(null);
   const [selectedMod, setSelectedMod] = useState(null);
+  const [currentView, setCurrentView] = useState('browse');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,9 +33,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setCurrentPage(1);
-    loadMods(1);
-  }, [selectedGame, searchQuery, sortBy]);
+    if (currentView === 'browse') {
+      setCurrentPage(1);
+      loadMods(1);
+    }
+  }, [selectedGame, searchQuery, sortBy, currentView]);
 
   const loadMods = async (page = currentPage) => {
     setLoading(true);
@@ -91,6 +95,7 @@ function App() {
     localStorage.removeItem('username');
     setUser(null);
     showToast('Oled välja logitud', 'info');
+    setCurrentView('browse');
   };
 
   const games = [
@@ -104,15 +109,46 @@ function App() {
     { id: 'kerbal', name: 'Kerbal Space Program', icon: '🚀' }
   ];
 
+  // Show favorites page
+  if (currentView === 'favorites') {
+    return (
+      <>
+        <Nav 
+          user={user}
+          onAuthClick={() => setShowAuthModal(true)}
+          onLogout={handleLogout}
+          onFavoritesClick={() => setCurrentView('favorites')}
+          onBrowseClick={() => setCurrentView('browse')}
+          currentView={currentView}
+        />
+        <Favorites user={user} onToast={showToast} />
+        {showAuthModal && (
+          <AuthModal
+            mode={authMode}
+            setMode={setAuthMode}
+            onClose={() => setShowAuthModal(false)}
+            onAuth={handleAuth}
+            onToast={showToast}
+          />
+        )}
+        {toast && <Toast message={toast.message} type={toast.type} />}
+      </>
+    );
+  }
+
+  // Show browse page
   return (
     <div className="app">
       <Nav 
         user={user}
         onAuthClick={() => setShowAuthModal(true)}
         onLogout={handleLogout}
+        onFavoritesClick={() => setCurrentView('favorites')}
+        onBrowseClick={() => setCurrentView('browse')}
+        currentView={currentView}
       />
       
-      {/* Hero Section - CurseForge Style */}
+      {/* Hero Section */}
       <div className="hero">
         <div className="hero-content">
           <h1>Explore Thousands of Mods</h1>
