@@ -32,7 +32,17 @@ export const api = {
   getModDescription: (id) => req(`/mods/${id}/description`),
   getModGallery: (id) => req(`/mods/${id}/gallery`),
   
-  downloadMod: (id) => req(`/mods/${id}/download`),
+  // NEW: Direct download functions
+  downloadMod: (id) => {
+    // Open download in new tab/window
+    window.open(`${BASE}/mods/${id}/download`, '_blank');
+  },
+  
+  getModFiles: (id) => req(`/mods/${id}/files`),
+  downloadSpecificVersion: (modId, fileId) => {
+    window.open(`${BASE}/mods/${modId}/download-version/${fileId}`, '_blank');
+  },
+  
   uploadMod: (formData) => {
     const token = getToken();
     return fetch(BASE + '/mods', {

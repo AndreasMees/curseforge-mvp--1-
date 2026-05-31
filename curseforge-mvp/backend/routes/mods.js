@@ -209,6 +209,69 @@ router.get('/:id/gallery', async (req, res) => {
     }
 });
 
+// GET /api/mods/:id/download - DIRECT DOWNLOAD (redirect to CurseForge CDN)
+router.get('/:id/download', async (req, res) => {
+    try {
+        const mod = await curseforgeFetch(`/mods/${req.params.id}`);
+        
+        if (!mod || !mod.latestFiles || mod.latestFiles.length === 0) {
+            return res.status(404).json({ error: 'No files available for download' });
+        }
+        
+        const latestFile = mod.latestFiles[0];
+        const downloadUrl = latestFile.downloadUrl;
+        
+        if (!downloadUrl) {
+            return res.status(404).json({ error: 'Download URL not available' });
+        }
+        
+        console.log(`📥 Downloading: ${latestFile.fileName}`);
+        console.log(`🔗 URL: ${downloadUrl}`);
+        
+        // Redirect to CurseForge CDN for direct download
+        res.redirect(downloadUrl);
+    } catch (error) {
+        console.error('Download error:', error);
+        res.status(500).json({ error: 'Failed to download mod: ' + error.message });
+    }
+});
+
+// GET /api/mods/:id/files - Get all available files for a mod (so user can choose version)
+router.get('/:id/files', async (req, res) => {
+    try {
+        const files = await curseforgeFetch(`/mods/${req.params.id}/files`);
+        const availableFiles = files.map(file => ({
+            id: file.id,
+            name: file.fileName,
+            size: file.fileLength,
+            date: file.fileDate,
+            downloadUrl: file.downloadUrl,
+            gameVersion: file.gameVersion,
+            fileType: file.fileType
+        }));
+        res.json(availableFiles);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch files: ' + error.message });
+    }
+});
+
+// GET /api/mods/:id/download-version/:fileId - Download specific version
+router.get('/:id/download-version/:fileId', async (req, res) => {
+    try {
+        const { id, fileId } = req.params;
+        const file = await curseforgeFetch(`/mods/${id}/files/${fileId}`);
+        
+        if (!file || !file.downloadUrl) {
+            return res.status(404).json({ error: 'File not found or download URL missing' });
+        }
+        
+        console.log(`📥 Downloading specific version: ${file.fileName}`);
+        res.redirect(file.downloadUrl);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to download file: ' + error.message });
+    }
+});
+
 // POST /api/mods - Upload custom mod
 router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
     const { name, description, game, version } = req.body;
@@ -222,21 +285,6 @@ router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
         [name, description, game, version || '1.0.0', req.file?.filename || null, req.user.id, req.user.username]
     );
     res.json({ id: result.lastInsertRowid, message: 'Mod edukalt üles laaditud!' });
-});
-
-// GET /api/mods/:id/download - Download local mod
-router.get('/:id/download', async (req, res) => {
-    const db = await getDB();
-    const mod = get(db, 'SELECT * FROM mods WHERE id = ?', [req.params.id]);
-    if (!mod) return res.status(404).json({ error: 'Moda ei leitud' });
-    
-    run(db, 'UPDATE mods SET downloads = downloads + 1 WHERE id = ?', [mod.id]);
-    
-    if (mod.filename) {
-        const filePath = path.join(__dirname, '../uploads', mod.filename);
-        if (fs.existsSync(filePath)) return res.download(filePath);
-    }
-    res.json({ message: 'Allalaadimine alustatud', mod: mod.name });
 });
 
 // DELETE /api/mods/:id - Delete local mod

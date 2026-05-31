@@ -7,9 +7,12 @@ function ModModal({ mod, onClose, onToast }) {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [error, setError] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [showFiles, setShowFiles] = useState(false);
 
   useEffect(() => {
     loadModDetails();
+    loadModFiles();
   }, [mod.id]);
 
   const loadModDetails = async () => {
@@ -32,11 +35,24 @@ function ModModal({ mod, onClose, onToast }) {
     }
   };
 
-  const handleDownload = () => {
-    if (mod.curseforge_url) {
-      window.open(mod.curseforge_url, '_blank');
-      onToast('Opening CurseForge...', 'success');
+  const loadModFiles = async () => {
+    try {
+      const filesData = await api.getModFiles(mod.id);
+      setFiles(filesData);
+    } catch (err) {
+      console.error('Error loading files:', err);
     }
+  };
+
+  const handleDownload = () => {
+    api.downloadMod(mod.id);
+    onToast(`Downloading ${mod.name}...`, 'success');
+  };
+
+  const handleVersionDownload = (file) => {
+    api.downloadSpecificVersion(mod.id, file.id);
+    onToast(`Downloading ${file.name}...`, 'success');
+    setShowFiles(false);
   };
 
   return (
@@ -111,9 +127,74 @@ function ModModal({ mod, onClose, onToast }) {
           </div>
         )}
 
+        {/* Version selector */}
+        {files.length > 1 && !showFiles && (
+          <div style={{ padding: '0 1.5rem' }}>
+            <button 
+              onClick={() => setShowFiles(true)}
+              style={{
+                background: '#25292e',
+                color: '#f1641e',
+                border: '1px solid #f1641e',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.85rem'
+              }}
+            >
+              📁 Other versions ({files.length} available)
+            </button>
+          </div>
+        )}
+
+        {showFiles && files.length > 1 && (
+          <div className="modal-description">
+            <h3>Available Versions</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {files.map(file => (
+                <button
+                  key={file.id}
+                  onClick={() => handleVersionDownload(file)}
+                  style={{
+                    background: '#25292e',
+                    border: '1px solid #2c3035',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div>
+                    <div style={{ color: 'white', fontWeight: '500' }}>{file.name}</div>
+                    <div style={{ color: '#8b8f95', fontSize: '0.75rem' }}>
+                      Minecraft {file.gameVersion?.[0] || 'Any'}
+                    </div>
+                  </div>
+                  <div style={{ color: '#f1641e' }}>↓ {(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                </button>
+              ))}
+              <button 
+                onClick={() => setShowFiles(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#8b8f95',
+                  cursor: 'pointer',
+                  marginTop: '0.5rem'
+                }}
+              >
+                Hide versions
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="modal-footer">
           <button className="modal-download-btn" onClick={handleDownload}>
-            📥 Download from CurseForge
+            ⬇️ Download Latest Version
           </button>
           <button className="modal-close-btn" onClick={onClose}>
             Close

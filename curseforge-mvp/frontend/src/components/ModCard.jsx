@@ -4,9 +4,12 @@ import { api } from '../api';
 function ModCard({ mod, user, onToast, onClick }) {
   const handleDownload = (e) => {
     e.stopPropagation();
-    if (mod.curseforge_url) {
-      window.open(mod.curseforge_url, '_blank');
-      onToast('Opening CurseForge...', 'success');
+    try {
+      // This will trigger direct download from CurseForge CDN
+      api.downloadMod(mod.id);
+      onToast(`Download started: ${mod.name}`, 'success');
+    } catch (error) {
+      onToast('Download failed: ' + error.message, 'error');
     }
   };
 
@@ -46,11 +49,11 @@ function ModCard({ mod, user, onToast, onClick }) {
         </div>
         <div className="mod-actions" onClick={(e) => e.stopPropagation()}>
           <button onClick={handleDownload} className="download-btn">
-            Download
+            ⬇️ Download Mod
           </button>
           {user && mod.author_name === user.username && (
             <button onClick={handleDelete} className="delete-btn">
-              Delete
+              🗑️ Delete
             </button>
           )}
         </div>
