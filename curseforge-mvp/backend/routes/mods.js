@@ -9,7 +9,7 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // ===== CURSEFORGE API CONFIGURATION =====
-const CURSEFORGE_API_KEY = '$2a$10$t4v8XU4bfLoiupy4XctOjeEc/4v1ocNS4nL4gQMfDOfn4Ro4vId1C';
+const CURSEFORGE_API_KEY = '$2a$10$TV8yO6VUWEvxqERmJeR35OWfuD0UXRQF8hp6dXuQ0tFsStYcP6qGy';
 const CURSEFORGE_BASE_URL = 'https://api.curseforge.com/v1';
 
 // Game IDs mapping
@@ -24,14 +24,14 @@ const GAME_IDS = {
     kerbal: 2282
 };
 
-// Helper function to call CurseForge API using native https
+// Helper function to call CurseForge API
 async function curseforgeFetch(endpoint, params = {}) {
     const url = new URL(`${CURSEFORGE_BASE_URL}${endpoint}`);
     Object.keys(params).forEach(key => {
         if (params[key]) url.searchParams.append(key, params[key]);
     });
     
-    console.log('🌐 Calling URL:', url.toString());
+    console.log('🌐 Calling:', url.toString());
     
     return new Promise((resolve, reject) => {
         const options = {
@@ -49,26 +49,26 @@ async function curseforgeFetch(endpoint, params = {}) {
             });
             
             res.on('end', () => {
-                console.log('📡 Response status:', res.statusCode);
+                console.log('📡 Status:', res.statusCode);
                 
                 if (res.statusCode !== 200) {
-                    console.log('❌ Error response:', data);
-                    reject(new Error(`CurseForge API error: ${res.statusCode}`));
+                    console.log('❌ Error:', data);
+                    reject(new Error(`API error: ${res.statusCode}`));
                     return;
                 }
                 
                 try {
                     const jsonData = JSON.parse(data);
-                    console.log('✅ Success! Received', jsonData.data?.length || 0, 'mods');
+                    console.log('✅ Got', jsonData.data?.length || 0, 'mods');
                     resolve(jsonData.data);
                 } catch (e) {
-                    reject(new Error('Failed to parse JSON response'));
+                    reject(new Error('Failed to parse JSON'));
                 }
             });
         });
         
         req.on('error', (error) => {
-            console.error('💥 Request error:', error.message);
+            console.error('💥 Error:', error.message);
             reject(error);
         });
         
@@ -88,55 +88,77 @@ const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
 // ===== API ENDPOINTS =====
 
-// GET /api/mods - Search mods from CurseForge API
+// GET /api/mods - Search mods with pagination
 router.get('/', async (req, res) => {
-    const { game = 'minecraft', q = '', sort = 'popular' } = req.query;
+    const { game = 'minecraft', q = '', sort = 'popular', page = 1, limit = 50 } = req.query;
     
-    let sortField = 1;
+    let sortField = 1; // popularity
     if (sort === 'new') sortField = 2;
-    if (sort === 'name') sortField = 3;
+    if (sort === 'downloads') sortField = 4;
     
     const gameId = GAME_IDS[game.toLowerCase()];
     if (!gameId) {
         return res.status(400).json({ error: 'Invalid game' });
     }
     
+    const pageNum = parseInt(page);
+    const pageSize = Math.min(parseInt(limit), 100);
+    const offset = (pageNum - 1) * pageSize;
+    
+    console.log(`📄 Page ${pageNum}, offset: ${offset}, limit: ${pageSize}`);
+    
     try {
         const params = {
             gameId: gameId,
-            pageSize: 50,
+            pageSize: pageSize,
             sortField: sortField,
             sortOrder: 'desc',
-            searchFilter: q
+            searchFilter: q,
+            index: offset
         };
         
         const mods = await curseforgeFetch('/mods/search', params);
         
         if (!mods || mods.length === 0) {
-            return res.json([]);
+            return res.json({
+                mods: [],
+                currentPage: pageNum,
+                totalPages: 1,
+                hasMore: false
+            });
         }
         
         const formattedMods = mods.map(mod => ({
             id: mod.id,
             name: mod.name,
-            description: mod.summary,
+            description: mod.summary || 'No description available',
             game: game,
             version: mod.latestFiles?.[0]?.gameVersion?.[0] || 'Latest',
             author_name: mod.authors?.[0]?.name || 'Unknown',
-            downloads: mod.downloadCount,
+            downloads: mod.downloadCount || 0,
             logo_url: mod.logo?.url || null,
-            curseforge_url: mod.links?.websiteUrl,
-            created_at: mod.dateCreated
+            curseforge_url: mod.links?.websiteUrl || `https://www.curseforge.com/${game}/mods/${mod.slug}`,
+            created_at: mod.dateCreated,
+            categories: mod.categories?.map(c => c.name) || []
         }));
         
-        res.json(formattedMods);
+        // Assume we can get more if we got full page size
+        const hasMore = mods.length === pageSize;
+        
+        res.json({
+            mods: formattedMods,
+            currentPage: pageNum,
+            totalPages: hasMore ? pageNum + 5 : pageNum, // Approximate
+            hasMore: hasMore,
+            totalMods: formattedMods.length
+        });
     } catch (error) {
         console.error('❌ Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch mods from CurseForge: ' + error.message });
+        res.status(500).json({ error: 'Failed to fetch mods: ' + error.message });
     }
 });
 
-// GET /api/mods/:id - Get specific mod from CurseForge
+// GET /api/mods/:id - Get specific mod
 router.get('/:id', async (req, res) => {
     try {
         const mod = await curseforgeFetch(`/mods/${req.params.id}`);
@@ -149,10 +171,13 @@ router.get('/:id', async (req, res) => {
             id: mod.id,
             name: mod.name,
             description: mod.summary,
+            full_description: null,
             author_name: mod.authors?.[0]?.name,
             downloads: mod.downloadCount,
             logo_url: mod.logo?.url,
-            curseforge_url: mod.links?.websiteUrl
+            curseforge_url: mod.links?.websiteUrl,
+            categories: mod.categories,
+            gameVersions: mod.latestFiles?.[0]?.gameVersion || []
         };
         
         res.json(formattedMod);
@@ -161,7 +186,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// POST /api/mods - Upload custom mod (stored locally)
+// POST /api/mods - Upload custom mod
 router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
     const { name, description, game, version } = req.body;
     if (!name || !game) {
@@ -191,7 +216,7 @@ router.get('/:id/download', async (req, res) => {
     res.json({ message: 'Allalaadimine alustatud', mod: mod.name });
 });
 
-// DELETE /api/mods/:id - Delete locally uploaded mod
+// DELETE /api/mods/:id - Delete local mod
 router.delete('/:id', authMiddleware, async (req, res) => {
     const db = await getDB();
     const mod = get(db, 'SELECT * FROM mods WHERE id = ?', [req.params.id]);

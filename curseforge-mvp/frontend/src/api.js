@@ -21,10 +21,14 @@ export const api = {
   register: (body) => req('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => req('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
 
-  getMods: (params = {}) => {
-    const qs = new URLSearchParams(params).toString();
-    return req('/mods' + (qs ? '?' + qs : ''));
+  getMods: async (params = {}) => {
+    const defaultParams = { page: 1, limit: 50, ...params };
+    const qs = new URLSearchParams(defaultParams).toString();
+    const response = await req('/mods' + (qs ? '?' + qs : ''));
+    // New response format with pagination
+    return response;
   },
+  getModById: (id) => req(`/mods/${id}`),
   downloadMod: (id) => req(`/mods/${id}/download`),
   uploadMod: (formData) => {
     const token = getToken();

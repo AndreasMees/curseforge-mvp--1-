@@ -1,27 +1,739 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* CurseForge Inspired CSS - Complete Version */
 :root {
-  --bg: #0d0f14;
-  --surface: #151820;
-  --surface2: #1c2030;
-  --border: rgba(255,255,255,0.07);
-  --accent: #f97316;
-  --accent2: #fb923c;
-  --text: #e8eaf0;
-  --muted: #7a8099;
-  --success: #22c55e;
-  --danger: #ef4444;
+  --primary: #f5821f;
+  --primary-dark: #e06c10;
+  --secondary: #2c2f33;
+  --dark: #23272a;
+  --darker: #1a1c1e;
+  --light: #f6f6f6;
+  --gray: #99aab5;
+  --border: #e2e8f0;
+  --card-bg: #ffffff;
+  --text: #2c2f33;
+  --text-light: #718096;
+  --success: #28a745;
+  --error: #dc3545;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background: var(--light);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+.app {
   min-height: 100vh;
 }
 
-input, button, select, textarea {
-  font-family: inherit;
+/* Navbar - CurseForge Style */
+.navbar {
+  background: var(--darker);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-a { text-decoration: none; color: inherit; }
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  color: var(--gray);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--gray);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+.auth-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.auth-btn:hover {
+  background: var(--primary-dark);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid var(--gray);
+  color: var(--gray);
+  padding: 0.3rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://media.forgecdn.net/avatars/thumbnails/201/609/256/256/636778085300802547.png') repeat;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero h1 .highlight {
+  color: var(--primary);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: var(--gray);
+  margin-bottom: 2rem;
+}
+
+.search-bar {
+  display: flex;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  background: white;
+}
+
+.search-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0 2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.search-btn:hover {
+  background: var(--primary-dark);
+}
+
+/* Game Categories */
+.game-categories {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 70px;
+  z-index: 99;
+  overflow-x: auto;
+}
+
+.categories-wrapper {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.game-category {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.game-category:hover {
+  background: var(--light);
+}
+
+.game-category.active {
+  background: var(--primary);
+  color: white;
+}
+
+.game-icon {
+  font-size: 1.2rem;
+}
+
+/* Filters Bar */
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-count {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filters-right select {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Mods Grid */
+.mods-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.mods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mod Card */
+.mod-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mod-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.mod-image {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, var(--dark), var(--darker));
+  overflow: hidden;
+}
+
+.mod-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mod-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.mod-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.mod-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.mod-description {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.mod-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.mod-author {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mod-downloads {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mod-version {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mod-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.download-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  flex: 1;
+}
+
+.download-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.02);
+}
+
+.delete-btn {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+/* Modern Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem 3rem;
+  margin-top: 2rem;
+}
+
+.pagination-btn {
+  background: linear-gradient(135deg, #f5821f 0%, #e06c10 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245,130,31,0.3);
+  background: linear-gradient(135deg, #f6933a 0%, #f5821f 100%);
+}
+
+.pagination-btn:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: white;
+  padding: 0.25rem;
+  border-radius: 60px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.page-btn {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:hover {
+  background: #f7fafc;
+  color: #f5821f;
+  transform: scale(1.05);
+}
+
+.page-btn.active {
+  background: linear-gradient(135deg, #f5821f 0%, #e06c10 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(245,130,31,0.3);
+}
+
+.page-dots {
+  color: #cbd5e0;
+  font-weight: 500;
+  padding: 0 0.25rem;
+  font-size: 1rem;
+}
+
+/* Pagination info text */
+.pagination-info {
+  text-align: center;
+  margin-top: 1rem;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  text-align: center;
+  padding: 4rem;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #f5821f;
+  border-right: 3px solid #f5821f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 4rem;
+}
+
+.no-results-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.no-results-content p {
+  color: var(--text-light);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  color: white;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast.success {
+  background: var(--success);
+}
+
+.toast.error {
+  background: var(--error);
+}
+
+.toast.info {
+  background: var(--primary);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Auth Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.modal h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.modal input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.modal button {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal button:hover {
+  background: var(--primary-dark);
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray);
+}
+
+.modal-switch {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+  
+  .mods-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .game-categories {
+    overflow-x: auto;
+    top: 60px;
+  }
+  
+  .categories-wrapper {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+  
+  .filters-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .page-numbers {
+    order: 3;
+    width: auto;
+    justify-content: center;
+    padding: 0.25rem;
+  }
+  
+  .page-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .pagination-btn span:last-child {
+    display: none;
+  }
+  
+  .pagination-btn span:first-child {
+    display: inline-block;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+  
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  
+  .mods-container {
+    padding: 1rem;
+  }
+  
+  .page-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .page-dots {
+    display: none;
+  }
+  
+  .pagination {
+    gap: 0.5rem;
+  }
+  
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
+}
