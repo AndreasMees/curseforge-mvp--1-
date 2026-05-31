@@ -6,6 +6,7 @@ import Nav from './components/Nav';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import Favorites from './pages/Favorites';
+import Homepage from './pages/Homepage';
 import './index.css';
 
 function App() {
@@ -22,7 +23,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState(null);
   const [selectedMod, setSelectedMod] = useState(null);
-  const [currentView, setCurrentView] = useState('browse');
+  const [currentView, setCurrentView] = useState('home'); // VAATA SIIN - peab olema 'home'
+
+  console.log('📍 Current view:', currentView); // SEE NÄITAB KONSOOLIS, MIS VIEW ON
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -95,6 +98,11 @@ function App() {
     localStorage.removeItem('username');
     setUser(null);
     showToast('Oled välja logitud', 'info');
+    setCurrentView('home');
+  };
+
+  const handleGameClick = (gameId) => {
+    setSelectedGame(gameId);
     setCurrentView('browse');
   };
 
@@ -109,8 +117,9 @@ function App() {
     { id: 'kerbal', name: 'Kerbal Space Program', icon: '🚀' }
   ];
 
-  // Show favorites page
-  if (currentView === 'favorites') {
+  // HOME PAGE VIEW
+  if (currentView === 'home') {
+    console.log('🏠 Showing HOMEPAGE');
     return (
       <>
         <Nav 
@@ -119,6 +128,39 @@ function App() {
           onLogout={handleLogout}
           onFavoritesClick={() => setCurrentView('favorites')}
           onBrowseClick={() => setCurrentView('browse')}
+          onHomeClick={() => setCurrentView('home')}
+          currentView={currentView}
+        />
+        <Homepage 
+          onGameClick={handleGameClick}
+          onBrowseClick={() => setCurrentView('browse')}
+        />
+        {showAuthModal && (
+          <AuthModal
+            mode={authMode}
+            setMode={setAuthMode}
+            onClose={() => setShowAuthModal(false)}
+            onAuth={handleAuth}
+            onToast={showToast}
+          />
+        )}
+        {toast && <Toast message={toast.message} type={toast.type} />}
+      </>
+    );
+  }
+
+  // FAVORITES PAGE VIEW
+  if (currentView === 'favorites') {
+    console.log('⭐ Showing FAVORITES');
+    return (
+      <>
+        <Nav 
+          user={user}
+          onAuthClick={() => setShowAuthModal(true)}
+          onLogout={handleLogout}
+          onFavoritesClick={() => setCurrentView('favorites')}
+          onBrowseClick={() => setCurrentView('browse')}
+          onHomeClick={() => setCurrentView('home')}
           currentView={currentView}
         />
         <Favorites user={user} onToast={showToast} />
@@ -136,7 +178,8 @@ function App() {
     );
   }
 
-  // Show browse page
+  // BROWSE PAGE VIEW
+  console.log('📚 Showing BROWSE page');
   return (
     <div className="app">
       <Nav 
@@ -145,14 +188,14 @@ function App() {
         onLogout={handleLogout}
         onFavoritesClick={() => setCurrentView('favorites')}
         onBrowseClick={() => setCurrentView('browse')}
+        onHomeClick={() => setCurrentView('home')}
         currentView={currentView}
       />
       
-      {/* Hero Section */}
       <div className="hero">
         <div className="hero-content">
-          <h1>Explore Thousands of Mods</h1>
-          <p>Discover endless modifications for your favorite games, or create your own and share them with millions.</p>
+          <h1>Explore <span className="highlight">{games.find(g => g.id === selectedGame)?.name || 'Minecraft'}</span> Mods</h1>
+          <p>Discover, download, and share the best mods for your favorite games</p>
           <div className="stats">
             <div className="stat-item">
               <div className="stat-number">500K+</div>
@@ -170,7 +213,6 @@ function App() {
         </div>
       </div>
       
-      {/* Search Bar */}
       <div className="search-section">
         <div className="search-container">
           <div className="search-input-wrapper">
@@ -189,7 +231,6 @@ function App() {
         </div>
       </div>
       
-      {/* Game Categories */}
       <div className="game-categories">
         <div className="categories-wrapper">
           {games.map(game => (
@@ -205,7 +246,6 @@ function App() {
         </div>
       </div>
       
-      {/* Filters Bar */}
       <div className="filters-bar">
         <div className="filters-left">
           <span className="results-count">{mods.length} mods on page {currentPage}</span>
@@ -220,7 +260,6 @@ function App() {
         </div>
       </div>
       
-      {/* Mods Grid */}
       <div className="mods-container">
         <div className="mods-grid">
           {mods.map(mod => (
@@ -235,7 +274,6 @@ function App() {
         </div>
       </div>
       
-      {/* Pagination */}
       {!loading && mods.length > 0 && (
         <>
           <div className="pagination">
@@ -243,36 +281,15 @@ function App() {
               <span>←</span>
               <span>Previous</span>
             </button>
-            
             <div className="page-numbers">
-              {currentPage > 2 && (
-                <button onClick={() => goToPage(1)} className="page-btn">1</button>
-              )}
+              {currentPage > 2 && <button onClick={() => goToPage(1)} className="page-btn">1</button>}
               {currentPage > 3 && <span className="page-dots">•••</span>}
-              {currentPage > 1 && (
-                <button onClick={() => goToPage(currentPage - 1)} className="page-btn">
-                  {currentPage - 1}
-                </button>
-              )}
+              {currentPage > 1 && <button onClick={() => goToPage(currentPage - 1)} className="page-btn">{currentPage - 1}</button>}
               <button className="page-btn active">{currentPage}</button>
-              {hasMore && (
-                <button onClick={() => goToPage(currentPage + 1)} className="page-btn">
-                  {currentPage + 1}
-                </button>
-              )}
-              {hasMore && currentPage + 2 <= totalPages && (
-                <button onClick={() => goToPage(currentPage + 2)} className="page-btn">
-                  {currentPage + 2}
-                </button>
-              )}
+              {hasMore && <button onClick={() => goToPage(currentPage + 1)} className="page-btn">{currentPage + 1}</button>}
+              {hasMore && currentPage + 2 <= totalPages && <button onClick={() => goToPage(currentPage + 2)} className="page-btn">{currentPage + 2}</button>}
               {hasMore && currentPage + 3 <= totalPages && <span className="page-dots">•••</span>}
-              {hasMore && currentPage + 2 < totalPages && (
-                <button onClick={() => goToPage(totalPages)} className="page-btn">
-                  {totalPages}
-                </button>
-              )}
             </div>
-            
             <button onClick={nextPage} disabled={!hasMore} className="pagination-btn">
               <span>Next</span>
               <span>→</span>
@@ -280,12 +297,10 @@ function App() {
           </div>
           <div className="pagination-info">
             Showing {mods.length} mods on page {currentPage}
-            {hasMore && ` — click on any mod to see more details!`}
           </div>
         </>
       )}
       
-      {/* Loading State */}
       {loading && (
         <div className="loading-spinner">
           <div className="spinner"></div>
@@ -293,7 +308,6 @@ function App() {
         </div>
       )}
       
-      {/* No Results */}
       {!loading && mods.length === 0 && (
         <div className="no-results">
           <h3>No mods found</h3>
@@ -301,7 +315,6 @@ function App() {
         </div>
       )}
       
-      {/* Auth Modal */}
       {showAuthModal && (
         <AuthModal
           mode={authMode}
@@ -312,10 +325,8 @@ function App() {
         />
       )}
       
-      {/* Toast Notifications */}
       {toast && <Toast message={toast.message} type={toast.type} />}
       
-      {/* Mod Detail Modal */}
       {selectedMod && (
         <ModModal 
           mod={selectedMod} 
