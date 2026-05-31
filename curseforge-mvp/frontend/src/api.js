@@ -25,10 +25,13 @@ export const api = {
     const defaultParams = { page: 1, limit: 50, ...params };
     const qs = new URLSearchParams(defaultParams).toString();
     const response = await req('/mods' + (qs ? '?' + qs : ''));
-    // New response format with pagination
     return response;
   },
+  
   getModById: (id) => req(`/mods/${id}`),
+  getModDescription: (id) => req(`/mods/${id}/description`),
+  getModGallery: (id) => req(`/mods/${id}/gallery`),
+  
   downloadMod: (id) => req(`/mods/${id}/download`),
   uploadMod: (formData) => {
     const token = getToken();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from './api';
 import ModCard from './components/ModCard';
+import ModModal from './components/ModModal';
 import Nav from './components/Nav';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
@@ -19,6 +20,7 @@ function App() {
   const [authMode, setAuthMode] = useState('login');
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState(null);
+  const [selectedMod, setSelectedMod] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -48,10 +50,8 @@ function App() {
       setCurrentPage(response.currentPage || page);
       setTotalPages(response.totalPages || 1);
       setHasMore(response.hasMore || false);
-      
-      console.log(`📄 Loaded page ${response.currentPage}, has more: ${response.hasMore}`);
     } catch (error) {
-      console.error('❌ Viga:', error);
+      console.error('Viga:', error);
       showToast(error.message, 'error');
     } finally {
       setLoading(false);
@@ -112,22 +112,48 @@ function App() {
         onLogout={handleLogout}
       />
       
+      {/* Hero Section - CurseForge Style */}
       <div className="hero">
         <div className="hero-content">
-          <h1>Browse <span className="highlight">{games.find(g => g.id === selectedGame)?.name || 'Minecraft'}</span> Mods</h1>
-          <p>Discover, download, and share the best mods for your favorite games</p>
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search mods... (e.g., 'dungeons', 'magic', 'tech')"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button className="search-btn" onClick={() => loadMods(1)}>🔍 Search</button>
+          <h1>Explore Thousands of Mods</h1>
+          <p>Discover endless modifications for your favorite games, or create your own and share them with millions.</p>
+          <div className="stats">
+            <div className="stat-item">
+              <div className="stat-number">500K+</div>
+              <div className="stat-label">MODS</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">100B+</div>
+              <div className="stat-label">DOWNLOADS</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">134K</div>
+              <div className="stat-label">AUTHORS</div>
+            </div>
           </div>
         </div>
       </div>
       
+      {/* Search Bar */}
+      <div className="search-section">
+        <div className="search-container">
+          <div className="search-input-wrapper">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Search for mods..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && loadMods(1)}
+            />
+          </div>
+          <button className="search-btn" onClick={() => loadMods(1)}>
+            Search
+          </button>
+        </div>
+      </div>
+      
+      {/* Game Categories */}
       <div className="game-categories">
         <div className="categories-wrapper">
           {games.map(game => (
@@ -143,6 +169,7 @@ function App() {
         </div>
       </div>
       
+      {/* Filters Bar */}
       <div className="filters-bar">
         <div className="filters-left">
           <span className="results-count">{mods.length} mods on page {currentPage}</span>
@@ -157,68 +184,72 @@ function App() {
         </div>
       </div>
       
+      {/* Mods Grid */}
       <div className="mods-container">
         <div className="mods-grid">
           {mods.map(mod => (
-            <ModCard key={mod.id} mod={mod} user={user} onToast={showToast} />
+            <ModCard 
+              key={mod.id} 
+              mod={mod} 
+              user={user} 
+              onToast={showToast}
+              onClick={() => setSelectedMod(mod)}
+            />
           ))}
         </div>
       </div>
       
-      {/* Pagination Component */}
+      {/* Pagination */}
       {!loading && mods.length > 0 && (
-        <div className="pagination">
-          <button 
-            onClick={prevPage} 
-            disabled={currentPage === 1}
-            className="pagination-btn"
-          >
-            ← Previous
-          </button>
-          
-          <div className="page-numbers">
-            {currentPage > 2 && (
-              <button onClick={() => goToPage(1)} className="page-btn">1</button>
-            )}
-            {currentPage > 3 && <span className="page-dots">...</span>}
+        <>
+          <div className="pagination">
+            <button onClick={prevPage} disabled={currentPage === 1} className="pagination-btn">
+              <span>←</span>
+              <span>Previous</span>
+            </button>
             
-            {currentPage > 1 && (
-              <button onClick={() => goToPage(currentPage - 1)} className="page-btn">
-                {currentPage - 1}
-              </button>
-            )}
+            <div className="page-numbers">
+              {currentPage > 2 && (
+                <button onClick={() => goToPage(1)} className="page-btn">1</button>
+              )}
+              {currentPage > 3 && <span className="page-dots">•••</span>}
+              {currentPage > 1 && (
+                <button onClick={() => goToPage(currentPage - 1)} className="page-btn">
+                  {currentPage - 1}
+                </button>
+              )}
+              <button className="page-btn active">{currentPage}</button>
+              {hasMore && (
+                <button onClick={() => goToPage(currentPage + 1)} className="page-btn">
+                  {currentPage + 1}
+                </button>
+              )}
+              {hasMore && currentPage + 2 <= totalPages && (
+                <button onClick={() => goToPage(currentPage + 2)} className="page-btn">
+                  {currentPage + 2}
+                </button>
+              )}
+              {hasMore && currentPage + 3 <= totalPages && <span className="page-dots">•••</span>}
+              {hasMore && currentPage + 2 < totalPages && (
+                <button onClick={() => goToPage(totalPages)} className="page-btn">
+                  {totalPages}
+                </button>
+              )}
+            </div>
             
-            <button className="page-btn active">{currentPage}</button>
-            
-            {hasMore && (
-              <button onClick={() => goToPage(currentPage + 1)} className="page-btn">
-                {currentPage + 1}
-              </button>
-            )}
-            {hasMore && currentPage + 2 <= totalPages && (
-              <button onClick={() => goToPage(currentPage + 2)} className="page-btn">
-                {currentPage + 2}
-              </button>
-            )}
-            
-            {hasMore && <span className="page-dots">...</span>}
-            {hasMore && totalPages > currentPage + 2 && (
-              <button onClick={() => goToPage(totalPages)} className="page-btn">
-                {totalPages}
-              </button>
-            )}
+            <button onClick={nextPage} disabled={!hasMore} className="pagination-btn">
+              <span>Next</span>
+              <span>→</span>
+            </button>
           </div>
-          
-          <button 
-            onClick={nextPage} 
-            disabled={!hasMore}
-            className="pagination-btn"
-          >
-            Next →
-          </button>
-        </div>
+          <div className="pagination-info">
+            Showing {mods.length} mods on page {currentPage}
+            {hasMore && ` — click on any mod to see more details!`}
+          </div>
+        </>
       )}
       
+      {/* Loading State */}
       {loading && (
         <div className="loading-spinner">
           <div className="spinner"></div>
@@ -226,15 +257,15 @@ function App() {
         </div>
       )}
       
+      {/* No Results */}
       {!loading && mods.length === 0 && (
         <div className="no-results">
-          <div className="no-results-content">
-            <h3>No mods found</h3>
-            <p>Try different search terms or browse another category</p>
-          </div>
+          <h3>No mods found</h3>
+          <p>Try different search terms or browse another category</p>
         </div>
       )}
       
+      {/* Auth Modal */}
       {showAuthModal && (
         <AuthModal
           mode={authMode}
@@ -245,7 +276,17 @@ function App() {
         />
       )}
       
+      {/* Toast Notifications */}
       {toast && <Toast message={toast.message} type={toast.type} />}
+      
+      {/* Mod Detail Modal */}
+      {selectedMod && (
+        <ModModal 
+          mod={selectedMod} 
+          onClose={() => setSelectedMod(null)} 
+          onToast={showToast}
+        />
+      )}
     </div>
   );
 }

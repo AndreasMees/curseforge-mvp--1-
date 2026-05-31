@@ -92,7 +92,7 @@ const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 router.get('/', async (req, res) => {
     const { game = 'minecraft', q = '', sort = 'popular', page = 1, limit = 50 } = req.query;
     
-    let sortField = 1; // popularity
+    let sortField = 1;
     if (sort === 'new') sortField = 2;
     if (sort === 'downloads') sortField = 4;
     
@@ -104,8 +104,6 @@ router.get('/', async (req, res) => {
     const pageNum = parseInt(page);
     const pageSize = Math.min(parseInt(limit), 100);
     const offset = (pageNum - 1) * pageSize;
-    
-    console.log(`📄 Page ${pageNum}, offset: ${offset}, limit: ${pageSize}`);
     
     try {
         const params = {
@@ -142,13 +140,12 @@ router.get('/', async (req, res) => {
             categories: mod.categories?.map(c => c.name) || []
         }));
         
-        // Assume we can get more if we got full page size
         const hasMore = mods.length === pageSize;
         
         res.json({
             mods: formattedMods,
             currentPage: pageNum,
-            totalPages: hasMore ? pageNum + 5 : pageNum, // Approximate
+            totalPages: hasMore ? pageNum + 5 : pageNum,
             hasMore: hasMore,
             totalMods: formattedMods.length
         });
@@ -183,6 +180,32 @@ router.get('/:id', async (req, res) => {
         res.json(formattedMod);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch mod details' });
+    }
+});
+
+// GET /api/mods/:id/description - Get full mod description
+router.get('/:id/description', async (req, res) => {
+    try {
+        const description = await curseforgeFetch(`/mods/${req.params.id}/description`);
+        res.json({ description: description });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch description' });
+    }
+});
+
+// GET /api/mods/:id/gallery - Get mod images/screenshots
+router.get('/:id/gallery', async (req, res) => {
+    try {
+        const mod = await curseforgeFetch(`/mods/${req.params.id}`);
+        const screenshots = mod.screenshots || [];
+        const gallery = screenshots.map(img => ({
+            url: img.url,
+            title: img.title || 'Screenshot',
+            thumbnail: img.thumbnailUrl || img.url
+        }));
+        res.json({ gallery: gallery, logo: mod.logo?.url });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch gallery' });
     }
 });
 
