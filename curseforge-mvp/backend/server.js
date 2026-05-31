@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth');
 const modRoutes = require('./routes/mods');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3005;
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
