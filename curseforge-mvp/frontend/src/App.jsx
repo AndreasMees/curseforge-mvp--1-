@@ -7,6 +7,8 @@ import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import Favorites from './pages/Favorites';
 import Homepage from './pages/Homepage';
+import AutocompleteSearch from './components/AutocompleteSearch';
+import CategoryFilters from './components/CategoryFilters';
 import './index.css';
 
 function App() {
@@ -23,9 +25,10 @@ function App() {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState(null);
   const [selectedMod, setSelectedMod] = useState(null);
-  const [currentView, setCurrentView] = useState('home'); // VAATA SIIN - peab olema 'home'
+  const [currentView, setCurrentView] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-  console.log('📍 Current view:', currentView); // SEE NÄITAB KONSOOLIS, MIS VIEW ON
+  console.log('Current view:', currentView);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -40,7 +43,7 @@ function App() {
       setCurrentPage(1);
       loadMods(1);
     }
-  }, [selectedGame, searchQuery, sortBy, currentView]);
+  }, [selectedGame, searchQuery, sortBy, selectedCategory, currentView]);
 
   const loadMods = async (page = currentPage) => {
     setLoading(true);
@@ -50,7 +53,8 @@ function App() {
         q: searchQuery,
         sort: sortBy,
         page: page,
-        limit: 50
+        limit: 50,
+        category: selectedCategory
       });
       
       setMods(response.mods || []);
@@ -119,7 +123,7 @@ function App() {
 
   // HOME PAGE VIEW
   if (currentView === 'home') {
-    console.log('🏠 Showing HOMEPAGE');
+    console.log('Showing HOMEPAGE');
     return (
       <>
         <Nav 
@@ -151,7 +155,7 @@ function App() {
 
   // FAVORITES PAGE VIEW
   if (currentView === 'favorites') {
-    console.log('⭐ Showing FAVORITES');
+    console.log('Showing FAVORITES');
     return (
       <>
         <Nav 
@@ -179,7 +183,7 @@ function App() {
   }
 
   // BROWSE PAGE VIEW
-  console.log('📚 Showing BROWSE page');
+  console.log('Showing BROWSE page');
   return (
     <div className="app">
       <Nav 
@@ -214,21 +218,13 @@ function App() {
       </div>
       
       <div className="search-section">
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Search for mods..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && loadMods(1)}
-            />
-          </div>
-          <button className="search-btn" onClick={() => loadMods(1)}>
-            Search
-          </button>
-        </div>
+        <AutocompleteSearch 
+          onSearch={(query) => {
+            setSearchQuery(query);
+            loadMods(1);
+          }}
+          onGameClick={handleGameClick}
+        />
       </div>
       
       <div className="game-categories">
@@ -246,6 +242,8 @@ function App() {
         </div>
       </div>
       
+      <CategoryFilters onCategoryChange={setSelectedCategory} />
+      
       <div className="filters-bar">
         <div className="filters-left">
           <span className="results-count">{mods.length} mods on page {currentPage}</span>
@@ -253,9 +251,9 @@ function App() {
         <div className="filters-right">
           <label>Sort by:</label>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="popular">🔥 Most Popular</option>
-            <option value="new">🆕 Newest</option>
-            <option value="downloads">📥 Most Downloads</option>
+            <option value="popular">Most Popular</option>
+            <option value="new">Newest</option>
+            <option value="downloads">Most Downloads</option>
           </select>
         </div>
       </div>
