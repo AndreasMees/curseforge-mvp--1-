@@ -8,7 +8,6 @@ import Toast from './components/Toast';
 import Favorites from './pages/Favorites';
 import Homepage from './pages/Homepage';
 import AutocompleteSearch from './components/AutocompleteSearch';
-import CategoryFilters from './components/CategoryFilters';
 import './index.css';
 
 function App() {
@@ -26,9 +25,6 @@ function App() {
   const [toast, setToast] = useState(null);
   const [selectedMod, setSelectedMod] = useState(null);
   const [currentView, setCurrentView] = useState('home');
-  const [selectedCategory, setSelectedCategory] = useState('');
-
-  console.log('Current view:', currentView);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -43,7 +39,7 @@ function App() {
       setCurrentPage(1);
       loadMods(1);
     }
-  }, [selectedGame, searchQuery, sortBy, selectedCategory, currentView]);
+  }, [selectedGame, searchQuery, sortBy, currentView]);
 
   const loadMods = async (page = currentPage) => {
     setLoading(true);
@@ -53,8 +49,7 @@ function App() {
         q: searchQuery,
         sort: sortBy,
         page: page,
-        limit: 50,
-        category: selectedCategory
+        limit: 50
       });
       
       setMods(response.mods || []);
@@ -123,7 +118,6 @@ function App() {
 
   // HOME PAGE VIEW
   if (currentView === 'home') {
-    console.log('Showing HOMEPAGE');
     return (
       <>
         <Nav 
@@ -155,7 +149,6 @@ function App() {
 
   // FAVORITES PAGE VIEW
   if (currentView === 'favorites') {
-    console.log('Showing FAVORITES');
     return (
       <>
         <Nav 
@@ -183,7 +176,6 @@ function App() {
   }
 
   // BROWSE PAGE VIEW
-  console.log('Showing BROWSE page');
   return (
     <div className="app">
       <Nav 
@@ -241,8 +233,6 @@ function App() {
           ))}
         </div>
       </div>
-      
-      <CategoryFilters onCategoryChange={setSelectedCategory} />
       
       <div className="filters-bar">
         <div className="filters-left">

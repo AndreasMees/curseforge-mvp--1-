@@ -27,36 +27,47 @@ function Homepage({ onGameClick, onBrowseClick }) {
     return num.toString();
   };
 
+  // Kõik mängud - modide arv 0, välja arvatud Minecraft
   const featuredGames = [
     { 
       id: 'minecraft', 
       name: 'MINECRAFT', 
       image: '/images/games/download (1).jpg',
-      bgColor: '#5e7c16'
+      bgColor: '#5e7c16',
+      mods: 282100,
+      downloads: 114100000000
     },
     { 
       id: 'wow', 
       name: 'WORLD OF WARCRAFT', 
       image: '/images/games/download (2).jpg',
-      bgColor: '#0078ff'
+      bgColor: '#0078ff',
+      mods: 0,
+      downloads: 0
     },
     { 
       id: 'ark', 
       name: 'ARK SURVIVAL ASCENDED', 
       image: '/images/games/download.jpg',
-      bgColor: '#2c8c5a'
+      bgColor: '#2c8c5a',
+      mods: 0,
+      downloads: 0
     },
     { 
       id: 'inzoi', 
       name: 'INZOI', 
       image: '/images/games/download (4).jpg',
-      bgColor: '#9b59b6'
+      bgColor: '#9b59b6',
+      mods: 0,
+      downloads: 0
     },
     { 
       id: 'hytale', 
       name: 'HYTALE', 
       image: '/images/games/download (3).jpg',
-      bgColor: '#ff6b35'
+      bgColor: '#ff6b35',
+      mods: 0,
+      downloads: 0
     }
   ];
 
@@ -93,33 +104,30 @@ function Homepage({ onGameClick, onBrowseClick }) {
       <div className="featured-games">
         <h2>Most Popular Games</h2>
         <div className="featured-grid">
-          {featuredGames.map((game) => {
-            const stats = gameStats[game.id] || { modCount: 0, downloads: 0 };
-            return (
-              <div
-                key={game.id}
-                className="featured-card"
-                onClick={() => onGameClick(game.id)}
-              >
-                <div className="featured-image">
-                  <img 
-                    src={game.image} 
-                    alt={game.name}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/120x120/1a1e22/ffffff?text=' + game.name.charAt(0);
-                    }}
-                  />
-                </div>
-                <div className="featured-info">
-                  <h3>{game.name}</h3>
-                  <div className="featured-stats">
-                    <span>Mods: {formatNumber(stats.modCount)}</span>
-                    <span>Downloads: {formatNumber(stats.downloads)}</span>
-                  </div>
+          {featuredGames.map((game) => (
+            <div
+              key={game.id}
+              className="featured-card"
+              onClick={() => onGameClick(game.id)}
+            >
+              <div className="featured-image">
+                <img 
+                  src={game.image} 
+                  alt={game.name}
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/120x120/1a1e22/ffffff?text=' + game.name.charAt(0);
+                  }}
+                />
+              </div>
+              <div className="featured-info">
+                <h3>{game.name}</h3>
+                <div className="featured-stats">
+                  <span>Mods: {formatNumber(game.mods)}</span>
+                  <span>Downloads: {formatNumber(game.downloads)}</span>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
