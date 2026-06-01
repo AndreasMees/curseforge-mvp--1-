@@ -184,11 +184,12 @@ body {
 
 .search-container {
   background: #25292e;
-  border-radius: 12px;
+  border-radius: 60px;
   padding: 0.25rem;
   display: flex;
   gap: 0.5rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  border: 1px solid #2c3035;
 }
 
 .search-input-wrapper {
@@ -196,13 +197,20 @@ body {
   display: flex;
   align-items: center;
   background: #1a1e22;
-  border-radius: 8px;
-  padding: 0 1rem;
+  border-radius: 60px;
+  padding: 0 1.5rem;
+  transition: all 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+  background: #1f2328;
+  box-shadow: 0 0 0 2px rgba(241,100,30,0.2);
 }
 
 .search-icon {
   color: #8b8f95;
   margin-right: 0.75rem;
+  font-size: 1rem;
 }
 
 .search-input-wrapper input {
@@ -217,21 +225,25 @@ body {
 
 .search-input-wrapper input::placeholder {
   color: #4a4f56;
+  font-weight: 400;
 }
 
 .search-btn {
   background: linear-gradient(135deg, #f1641e, #f57c3a);
   color: white;
   border: none;
-  padding: 0.6rem 1.8rem;
-  border-radius: 8px;
+  padding: 0.7rem 2rem;
+  border-radius: 60px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.85rem;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .search-btn:hover {
   transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(241,100,30,0.3);
 }
 
 .game-categories {
@@ -1041,8 +1053,14 @@ body {
   display: flex;
   align-items: center;
   background: #1a1e22;
-  border-radius: 8px;
-  padding: 0 1rem;
+  border-radius: 60px;
+  padding: 0 1.5rem;
+  transition: all 0.2s;
+}
+
+.autocomplete-input-wrapper:focus-within {
+  background: #1f2328;
+  box-shadow: 0 0 0 2px rgba(241,100,30,0.2);
 }
 
 .autocomplete-dropdown {
@@ -1052,7 +1070,7 @@ body {
   right: 0;
   background: #1a1e22;
   border: 1px solid #2c3035;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-top: 0.5rem;
   max-height: 280px;
   overflow-y: auto;
@@ -1407,6 +1425,25 @@ body {
   
   .cta-content {
     padding: 1.5rem;
+  }
+  
+  .search-section {
+    padding: 0 1rem;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    border-radius: 16px;
+    gap: 0.25rem;
+  }
+  
+  .search-input-wrapper {
+    padding: 0.5rem 1rem;
+  }
+  
+  .search-btn {
+    width: 100%;
+    padding: 0.6rem;
   }
 }
 

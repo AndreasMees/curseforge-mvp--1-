@@ -27,10 +27,12 @@ function AutocompleteSearch({ onSearch, onGameClick }) {
       
       setLoading(true);
       try {
-        const results = await api.getAutocompleteSuggestions(query);
-        setSuggestions(results.slice(0, 8));
+        const response = await api.getMods({ q: query, limit: 8 });
+        const mods = response.mods || [];
+        setSuggestions(mods);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
+        setSuggestions([]);
       } finally {
         setLoading(false);
       }
@@ -61,20 +63,22 @@ function AutocompleteSearch({ onSearch, onGameClick }) {
 
   return (
     <div className="autocomplete-wrapper" ref={wrapperRef}>
-      <div className="autocomplete-input-wrapper">
-        <span className="search-icon">🔍</span>
-        <input
-          type="text"
-          placeholder="Search for mods..."
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setShowSuggestions(true);
-          }}
-          onKeyPress={handleKeyPress}
-          onFocus={() => setShowSuggestions(true)}
-        />
-        {loading && <div className="search-loading"></div>}
+      <div className="search-container">
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search for mods..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onKeyPress={handleKeyPress}
+            onFocus={() => setShowSuggestions(true)}
+          />
+          {loading && <div className="search-loading"></div>}
+        </div>
         <button className="search-btn" onClick={handleSearch}>
           Search
         </button>
@@ -88,13 +92,15 @@ function AutocompleteSearch({ onSearch, onGameClick }) {
               className="autocomplete-item"
               onClick={() => handleSuggestionClick(mod)}
             >
-              {mod.logo_url && (
+              {mod.logo_url ? (
                 <img src={mod.logo_url} alt={mod.name} className="autocomplete-icon" />
+              ) : (
+                <div className="autocomplete-icon-placeholder">📦</div>
               )}
               <div className="autocomplete-info">
                 <div className="autocomplete-name">{mod.name}</div>
                 <div className="autocomplete-meta">
-                  Author: {mod.author_name}  Downloads: {mod.downloads.toLocaleString()}
+                  {mod.author_name} • {mod.downloads?.toLocaleString()} downloads
                 </div>
               </div>
             </div>
